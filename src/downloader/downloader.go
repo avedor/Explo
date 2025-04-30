@@ -1,6 +1,7 @@
 package downloader
 
 import (
+	"log"
 	"os"
 	"path"
 	"log"
@@ -17,7 +18,7 @@ import (
 )
 
 type DownloadClient struct {
-	Cfg *cfg.DownloadConfig
+	Cfg         *cfg.DownloadConfig
 	Downloaders []Downloader
 }
 
@@ -26,7 +27,6 @@ type Downloader interface {
 	GetTrack(*models.Track) error
 	MonitorDownloads([]*models.Track) error
 }
-
 
 func NewDownloader(cfg *cfg.DownloadConfig, httpClient *util.HttpClient) *DownloadClient { // get download services from config and append them to DownloadClient
 	var downloader []Downloader
@@ -38,13 +38,14 @@ func NewDownloader(cfg *cfg.DownloadConfig, httpClient *util.HttpClient) *Downlo
 			slskdClient := NewSlskd(cfg.Slskd, cfg.DownloadDir)
 			slskdClient.AddHeader()
 			downloader = append(downloader, slskdClient)
+		case "lidarr":
+			downloader = append(downloader, NewLidarr(cfg.Lidarr, cfg.Discovery, cfg.DownloadDir, httpClient))
 		default:
 			log.Fatalf("downloader '%s' not supported", service)
 		}
 	}
-
 	return &DownloadClient{
-		Cfg: cfg,
+		Cfg:         cfg,
 		Downloaders: downloader}
 }
 
@@ -90,7 +91,7 @@ func (c *DownloadClient) DeleteSongs() {
 	for _, entry := range entries {
 		if !(entry.IsDir()) {
 			err = os.Remove(path.Join(c.Cfg.DownloadDir, entry.Name()))
-			
+
 			if err != nil {
 				log.Printf("failed to remove file: %s", err.Error())
 			}
@@ -108,6 +109,7 @@ func filterTracks(tracks *[]*models.Track) { // only keep tracks that were downl
 	}
 	*tracks = filteredTracks
 }
+<<<<<<< HEAD
 
 func containsLower(str string, substr string) bool {
 
@@ -131,6 +133,7 @@ func getFilename(title, artist string) string {
 
 	return fmt.Sprintf("%s-%s",t,a)
 }
+<<<<<<< HEAD
 
 func moveDownload(srcDir, destDir, trackPath, file string) error { // Move download from the source dir to the dest dir (download dir)
 	trackDir := filepath.Join(srcDir, trackPath)
@@ -187,3 +190,7 @@ func moveDownload(srcDir, destDir, trackPath, file string) error { // Move downl
 
 	return nil
 }
+=======
+=======
+>>>>>>> 3f855d8 (Implement initial support for Lidarr downloader)
+>>>>>>> d3648a3 (Implement initial support for Lidarr downloader)
