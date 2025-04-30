@@ -1,21 +1,19 @@
 package downloader
 
 import (
+	"log"
 	"os"
 	"path"
-	"log"
-	"strings"
-	"regexp"
-	"fmt"
-	"golang.org/x/sync/errgroup"
 
 	cfg "explo/src/config"
 	"explo/src/models"
 	"explo/src/util"
+
+	"golang.org/x/sync/errgroup"
 )
 
 type DownloadClient struct {
-	Cfg *cfg.DownloadConfig
+	Cfg         *cfg.DownloadConfig
 	Downloaders []Downloader
 }
 
@@ -25,56 +23,50 @@ type Downloader interface {
 	MonitorDownloads([]*models.Track) error
 }
 
-
 func NewDownloader(cfg *cfg.DownloadConfig, httpClient *util.HttpClient) *DownloadClient { // get download services from config and append them to DownloadClient
 	var downloader []Downloader
 	for _, service := range cfg.Services {
 		switch service {
 		case "youtube":
 			downloader = append(downloader, NewYoutube(cfg.Youtube, cfg.Discovery, cfg.DownloadDir, httpClient))
-		case "slskd":
-			slskdClient := NewSlskd(cfg.Slskd)
-			slskdClient.AddHeader()
-			downloader = append(downloader, slskdClient)
-		default:
-			log.Fatalf("downloader '%s' not supported", service)
+		case "lidarr":
+			downloader = append(downloader, NewLidarr(cfg.Lidarr, cfg.Discovery, cfg.DownloadDir, httpClient))
 		}
 	}
-
 	return &DownloadClient{
-		Cfg: cfg,
+		Cfg:         cfg,
 		Downloaders: downloader}
 }
 
-	func (c *DownloadClient) StartDownload(tracks *[]*models.Track) {
-		for _, d := range c.Downloaders {
-			var g errgroup.Group
-			g.SetLimit(5)
-			
-			for _, track := range *tracks {
-				if track.Present {
-					continue
-				}
-					
-				g.Go(func() error {
-		
-					if err := d.QueryTrack(track); err != nil {
-						log.Println(err.Error())
-						return nil
-					}
-					if err := d.GetTrack(track); err != nil {
-						log.Println(err.Error())
-						return nil
-					}
+func (c *DownloadClient) StartDownload(tracks *[]*models.Track) {
+	for _, d := range c.Downloaders {
+		var g errgroup.Group
+		g.SetLimit(5)
+
+		for _, track := range *tracks {
+			if track.Present {
+				continue
+			}
+
+			g.Go(func() error {
+
+				if err := d.QueryTrack(track); err != nil {
+					log.Println(err.Error())
 					return nil
-				})
+				}
+				if err := d.GetTrack(track); err != nil {
+					log.Println(err.Error())
+					return nil
+				}
+				return nil
+			})
 		}
 		if err := g.Wait(); err != nil {
 			return
 		}
-		
+
 		if err := d.MonitorDownloads(*tracks); err != nil {
-				log.Printf("track monitoring failed: %s", err.Error())
+			log.Printf("track monitoring failed: %s", err.Error())
 		}
 	}
 	filterTracks(tracks)
@@ -88,7 +80,7 @@ func (c *DownloadClient) DeleteSongs() {
 	for _, entry := range entries {
 		if !(entry.IsDir()) {
 			err = os.Remove(path.Join(c.Cfg.DownloadDir, entry.Name()))
-			
+
 			if err != nil {
 				log.Printf("failed to remove file: %s", err.Error())
 			}
@@ -105,27 +97,4 @@ func filterTracks(tracks *[]*models.Track) { // only keep tracks that were downl
 		}
 	}
 	*tracks = filteredTracks
-}
-
-func containsLower(str string, substr string) bool {
-
-	return strings.Contains(
-        strings.ToLower(str),
-        strings.ToLower(substr),
-    )
-}
-
-func sanitizeName(s string) string { // return string with only letters and digits
-	var sanitizer = regexp.MustCompile(`[^\p{L}\d]+`)
-	return sanitizer.ReplaceAllString(s, "")
-}
-
-func getFilename(title, artist string) string {
-
-	// Remove illegal characters for file naming
-	re := regexp.MustCompile(`[^\p{L}\d._,\-]+`)
-	t := re.ReplaceAllString(title, "_")
-	a := re.ReplaceAllString(artist, "_")
-
-	return fmt.Sprintf("%s-%s",t,a)
 }
