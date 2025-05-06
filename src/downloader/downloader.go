@@ -1,9 +1,9 @@
 package downloader
 
 import (
+	"log"
 	"os"
 	"path"
-	"log"
 
 	cfg "explo/src/config"
 	"explo/src/debug"
@@ -12,7 +12,7 @@ import (
 )
 
 type DownloadClient struct {
-	Cfg *cfg.DownloadConfig
+	Cfg         *cfg.DownloadConfig
 	Downloaders []Downloader
 }
 
@@ -21,18 +21,19 @@ type Downloader interface {
 	GetTrack(*models.Track) error
 }
 
-
 func NewDownloader(cfg *cfg.DownloadConfig, httpClient *util.HttpClient) *DownloadClient { // get download services from config and append them to DownloadClient
 	var downloader []Downloader
 	for _, service := range cfg.Services {
 		switch service {
+		case "slskd":
+			downloader = append(downloader, NewSlskd(cfg.Slskd, cfg.Discovery, cfg.DownloadDir, httpClient))
 		case "youtube":
 			downloader = append(downloader, NewYoutube(cfg.Youtube, cfg.Discovery, cfg.DownloadDir, httpClient))
 		}
 	}
 
 	return &DownloadClient{
-		Cfg: cfg,
+		Cfg:         cfg,
 		Downloaders: downloader}
 }
 
@@ -67,7 +68,7 @@ func (c *DownloadClient) DeleteSongs() {
 	for _, entry := range entries {
 		if !(entry.IsDir()) {
 			err = os.Remove(path.Join(c.Cfg.DownloadDir, entry.Name()))
-			
+
 			if err != nil {
 				log.Printf("failed to remove file: %s", err.Error())
 			}

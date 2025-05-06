@@ -1,77 +1,84 @@
 package config
 
 import (
-	"log"
 	"fmt"
-	"time"
+	"log"
 	"strings"
+	"time"
+
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
 type Config struct {
-	DownloadCfg DownloadConfig
+	DownloadCfg  DownloadConfig
 	DiscoveryCfg DiscoveryConfig
-	ClientCfg ClientConfig
-	Persist bool `env:"PERSIST" env-default:"true"`
-	System string `env:"EXPLO_SYSTEM"`
-	Debug bool `env:"DEBUG" env-default:"false"`
+	ClientCfg    ClientConfig
+	Persist      bool   `env:"PERSIST" env-default:"true"`
+	System       string `env:"EXPLO_SYSTEM"`
+	Debug        bool   `env:"DEBUG" env-default:"false"`
 }
 
 type ClientConfig struct {
-	ClientID string `env:"CLIENT_ID" env-default:"explo"`
-	LibraryName string `env:"LIBRARY_NAME" env-default:"Explo"`
-	URL string `env:"SYSTEM_URL"`
-	DownloadDir string `env:"DOWNLOAD_DIR"`
-	PlaylistDir string `env:"PLAYLIST_DIR"`
+	ClientID     string `env:"CLIENT_ID" env-default:"explo"`
+	LibraryName  string `env:"LIBRARY_NAME" env-default:"Explo"`
+	URL          string `env:"SYSTEM_URL"`
+	DownloadDir  string `env:"DOWNLOAD_DIR"`
+	PlaylistDir  string `env:"PLAYLIST_DIR"`
 	PlaylistName string
-	PlaylistID string
-	Sleep int `env:"SLEEP" env-default:"2"`
-	Creds Credentials
-	Subsonic SubsonicConfig
+	PlaylistID   string
+	Sleep        int `env:"SLEEP" env-default:"2"`
+	Creds        Credentials
+	Subsonic     SubsonicConfig
 }
 
 type Credentials struct {
-	APIKey string `env:"API_KEY"`
-	User string `env:"SYSTEM_USERNAME"`
+	APIKey   string `env:"API_KEY"`
+	User     string `env:"SYSTEM_USERNAME"`
 	Password string `env:"SYSTEM_PASSWORD"`
-	Headers map[string]string
-	Token string
-	Salt string
+	Headers  map[string]string
+	Token    string
+	Salt     string
 }
 
-
 type SubsonicConfig struct {
-	Version	string `env:"SUBSONIC_VERSION" env-default:"1.16.1"`
-	ID string `env:"CLIENT" env-default:"explo"`
-	URL	string `env:"SUBSONIC_URL" env-default:"http://127.0.0.1:4533"`
-	User string `env:"SUBSONIC_USER"`
+	Version  string `env:"SUBSONIC_VERSION" env-default:"1.16.1"`
+	ID       string `env:"CLIENT" env-default:"explo"`
+	URL      string `env:"SUBSONIC_URL" env-default:"http://127.0.0.1:4533"`
+	User     string `env:"SUBSONIC_USER"`
 	Password string `env:"SUBSONIC_PASSWORD"`
 }
 
 type DownloadConfig struct {
 	DownloadDir string `env:"DOWNLOAD_DIR"`
-	Youtube Youtube
-	Discovery string `env:"LISTENBRAINZ_DISCOVERY" env-default:"playlist"`
-	Services []string `env:"DOWNLOAD_SERVICES" env-default:"youtube"`
+	Slskd       Slskd
+	Youtube     Youtube
+	Discovery   string   `env:"LISTENBRAINZ_DISCOVERY" env-default:"playlist"`
+	Services    []string `env:"DOWNLOAD_SERVICES" env-default:"youtube"`
 }
 
 type Youtube struct {
-	APIKey string `env:"YOUTUBE_API_KEY"`
-	Separator string `env:"FILENAME_SEPARATOR" env-default:" "`
-	FfmpegPath string `env:"FFMPEG_PATH"`
-	YtdlpPath string `env:"YTDLP_PATH"`
+	APIKey     string   `env:"YOUTUBE_API_KEY"`
+	Separator  string   `env:"FILENAME_SEPARATOR" env-default:" "`
+	FfmpegPath string   `env:"FFMPEG_PATH"`
+	YtdlpPath  string   `env:"YTDLP_PATH"`
 	FilterList []string `env:"FILTER_LIST" env-default:"live,remix,instrumental,extended"`
 }
 
+type Slskd struct {
+	APIKey string `env:"SLSKD_API_KEY"`
+	Scheme string `env:"LIDARR_SCHEME" env-default:"http"`
+	URL    string `env:"SLSKD_URL"`
+}
+
 type DiscoveryConfig struct {
-	Discovery string `env:"DISCOVERY_SERVICE" env-default:"listenbrainz"`
-	Separator string `env:"FILENAME_SEPARATOR" env-default:" "`
+	Discovery    string `env:"DISCOVERY_SERVICE" env-default:"listenbrainz"`
+	Separator    string `env:"FILENAME_SEPARATOR" env-default:" "`
 	Listenbrainz Listenbrainz
 }
 type Listenbrainz struct {
-	Discovery string `env:"LISTENBRAINZ_DISCOVERY" env-default:"playlist"`
-	User string `env:"LISTENBRAINZ_USER"`
-	SingleArtist bool `env:"SINGLE_ARTIST" env-default:"true"`
+	Discovery    string `env:"LISTENBRAINZ_DISCOVERY" env-default:"playlist"`
+	User         string `env:"LISTENBRAINZ_USER"`
+	SingleArtist bool   `env:"SINGLE_ARTIST" env-default:"true"`
 }
 
 func ReadEnv() Config {
@@ -97,24 +104,25 @@ func fixDir(dir string) string {
 	return dir
 }
 
-/* func (cfg *Config) HandleDeprecation() { // no deprecations at the moment (keeping this for reference)
-	switch cfg.System {
-	case "subsonic":
-		if cfg.Subsonic.User != "" && cfg.Creds.User == "" {
-			log.Println("Warning: 'SUBSONIC_USER' is deprecated. Please use 'SYSTEM_USERNAME'.")
-			cfg.Creds.User = cfg.Subsonic.User
-		}
-		if cfg.Subsonic.Password != "" && cfg.Creds.Password == "" {
-			log.Println("Warning: 'SUBSONIC_PASSWORD' is deprecated. Please use 'SYSTEM_PASSWORD'.")
-			cfg.Creds.Password = cfg.Subsonic.Password
-		}
-		if cfg.Subsonic.URL != "" && cfg.URL == "" {
-			log.Println("Warning: 'SUBSONIC_URL' is deprecated. Please use 'SYSTEM_URL'.")
-			cfg.URL = cfg.Subsonic.URL
+/*
+	 func (cfg *Config) HandleDeprecation() { // no deprecations at the moment (keeping this for reference)
+		switch cfg.System {
+		case "subsonic":
+			if cfg.Subsonic.User != "" && cfg.Creds.User == "" {
+				log.Println("Warning: 'SUBSONIC_USER' is deprecated. Please use 'SYSTEM_USERNAME'.")
+				cfg.Creds.User = cfg.Subsonic.User
+			}
+			if cfg.Subsonic.Password != "" && cfg.Creds.Password == "" {
+				log.Println("Warning: 'SUBSONIC_PASSWORD' is deprecated. Please use 'SYSTEM_PASSWORD'.")
+				cfg.Creds.Password = cfg.Subsonic.Password
+			}
+			if cfg.Subsonic.URL != "" && cfg.URL == "" {
+				log.Println("Warning: 'SUBSONIC_URL' is deprecated. Please use 'SYSTEM_URL'.")
+				cfg.URL = cfg.Subsonic.URL
+			}
 		}
 	}
-}
- */
+*/
 func (cfg *Config) GetPlaylistName() { // Generate playlist name depending if user wants to keep it or not
 	playlistName := "Discover-Weekly"
 	if cfg.Persist {
