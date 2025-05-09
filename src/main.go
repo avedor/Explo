@@ -33,11 +33,16 @@ func main() {
 
 	cfg := config.ReadEnv()
 	setup(&cfg)
+<<<<<<< HEAD
 	httpClient := initHttpClient()
 	client, err := client.NewClient(&cfg, httpClient)
 	if err != nil {
 		log.Fatal(err)
 	}
+=======
+	httpClient := initHttpClient(&cfg)
+	client, err := client.NewClient(&cfg, httpClient)
+>>>>>>> 12dee0d (Upgrade linter action; surface more errors)
 	discovery := discovery.NewDiscoverer(cfg.DiscoveryCfg, httpClient)
 	downloader := downloader.NewDownloader(&cfg.DownloadCfg, httpClient)
 
