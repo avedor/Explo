@@ -1,16 +1,10 @@
 package config
 
 import (
-<<<<<<< HEAD
 	"errors"
 	"fmt"
 	"log"
 	"os"
-	"time"
-=======
-	"fmt"
-	"log"
->>>>>>> c15d224 (Implement initial support for Lidarr downloader)
 	"strings"
 	"time"
 
@@ -28,20 +22,12 @@ type Config struct {
 }
 
 type ClientConfig struct {
-<<<<<<< HEAD
-	ClientID string `env:"CLIENT_ID" env-default:"explo"`
-	LibraryName string `env:"LIBRARY_NAME" env-default:"Explo"`
-	URL string `env:"SYSTEM_URL"`
-	DownloadDir string `env:"DOWNLOAD_DIR" env-default:"/data/"`
-	SlskdDir string `env:"SLSKD_DIR"`
-	PlaylistDir string `env:"PLAYLIST_DIR"`
-=======
 	ClientID     string `env:"CLIENT_ID" env-default:"explo"`
 	LibraryName  string `env:"LIBRARY_NAME" env-default:"Explo"`
 	URL          string `env:"SYSTEM_URL"`
-	DownloadDir  string `env:"DOWNLOAD_DIR"`
+	DownloadDir  string `env:"DOWNLOAD_DIR" env-default:"/data/"`
+	SlskdDir     string `env:"SLSKD_DIR"`
 	PlaylistDir  string `env:"PLAYLIST_DIR"`
->>>>>>> c15d224 (Implement initial support for Lidarr downloader)
 	PlaylistName string
 	PlaylistID   string
 	Sleep        int `env:"SLEEP" env-default:"2"`
@@ -67,67 +53,38 @@ type SubsonicConfig struct {
 }
 
 type DownloadConfig struct {
-<<<<<<< HEAD
 	DownloadDir string `env:"DOWNLOAD_DIR" env-default:"/data/"`
-	Youtube Youtube
-	Slskd Slskd
-	Discovery string `env:"LISTENBRAINZ_DISCOVERY" env-default:"playlist"`
-	Services []string `env:"DOWNLOAD_SERVICES" env-default:"youtube"`
-=======
-	DownloadDir string `env:"DOWNLOAD_DIR"`
-	Lidarr      Lidarr
 	Youtube     Youtube
+	Slskd       Slskd
 	Discovery   string   `env:"LISTENBRAINZ_DISCOVERY" env-default:"playlist"`
 	Services    []string `env:"DOWNLOAD_SERVICES" env-default:"youtube"`
 }
 
-type Lidarr struct {
-	APIKey     string   `env:"LIDARR_API_KEY"`
-	Separator  string   `env:"FILENAME_SEPARATOR" env-default:" "`
-	FilterList []string `env:"FILTER_LIST" env-default:"live,remix,instrumental,extended"`
-	Scheme     string   `env:"LIDARR_SCHEME" env-default:"http"`
-	URL        string   `env:"LIDARR_URL"`
->>>>>>> c15d224 (Implement initial support for Lidarr downloader)
-}
-
 type Filters struct {
-	Extensions []string `env:"EXTENSIONS" env-default:"flac,mp3"`
-	MinBitDepth int `env:"MIN_BIT_DEPTH" env-default:"8"`
-	MinBitRate int `env:"MIN_BITRATE" env-default:"256"`
-	FilterList []string `env:"FILTER_LIST" env-default:"live,remix,instrumental,extended"`
+	Extensions  []string `env:"EXTENSIONS" env-default:"flac,mp3"`
+	MinBitDepth int      `env:"MIN_BIT_DEPTH" env-default:"8"`
+	MinBitRate  int      `env:"MIN_BITRATE" env-default:"256"`
+	FilterList  []string `env:"FILTER_LIST" env-default:"live,remix,instrumental,extended"`
 }
 
 type Youtube struct {
-<<<<<<< HEAD
-	APIKey string `env:"YOUTUBE_API_KEY"`
+	APIKey     string `env:"YOUTUBE_API_KEY"`
 	FfmpegPath string `env:"FFMPEG_PATH"`
-	YtdlpPath string `env:"YTDLP_PATH"`
-	Filters Filters
+	YtdlpPath  string `env:"YTDLP_PATH"`
+	Filters    Filters
 }
 
 type Slskd struct {
-	APIKey string `env:"SLSKD_API_KEY"`
-	URL string `env:"SLSKD_URL"`
-	Retry int `env:"SLSKD_RETRY" env-default:"5"` // Number of times to check search status before skipping the track
-	DownloadAttempts int `env:"SLSKD_DL_ATTEMPTS" env-default:"3"` // Max number of files to attempt downloading per track
-	Timeout time.Duration `env:"SLSKD_TIMEOUT" env-default:"20s"`
-	Filters Filters
-}
-
-type DiscoveryConfig struct {
-	Discovery string `env:"DISCOVERY_SERVICE" env-default:"listenbrainz"`
-=======
-	APIKey     string   `env:"YOUTUBE_API_KEY"`
-	Separator  string   `env:"FILENAME_SEPARATOR" env-default:" "`
-	FfmpegPath string   `env:"FFMPEG_PATH"`
-	YtdlpPath  string   `env:"YTDLP_PATH"`
-	FilterList []string `env:"FILTER_LIST" env-default:"live,remix,instrumental,extended"`
+	APIKey           string        `env:"SLSKD_API_KEY"`
+	URL              string        `env:"SLSKD_URL"`
+	Retry            int           `env:"SLSKD_RETRY" env-default:"5"`       // Number of times to check search status before skipping the track
+	DownloadAttempts int           `env:"SLSKD_DL_ATTEMPTS" env-default:"3"` // Max number of files to attempt downloading per track
+	Timeout          time.Duration `env:"SLSKD_TIMEOUT" env-default:"20s"`
+	Filters          Filters
 }
 
 type DiscoveryConfig struct {
 	Discovery    string `env:"DISCOVERY_SERVICE" env-default:"listenbrainz"`
-	Separator    string `env:"FILENAME_SEPARATOR" env-default:" "`
->>>>>>> c15d224 (Implement initial support for Lidarr downloader)
 	Listenbrainz Listenbrainz
 }
 type Listenbrainz struct {
