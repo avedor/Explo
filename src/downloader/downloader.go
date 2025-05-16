@@ -1,6 +1,7 @@
 package downloader
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path"
@@ -49,35 +50,35 @@ func NewDownloader(cfg *cfg.DownloadConfig, httpClient *util.HttpClient) *Downlo
 		Downloaders: downloader}
 }
 
-	func (c *DownloadClient) StartDownload(tracks *[]*models.Track) {
-		for _, d := range c.Downloaders {
-			var g errgroup.Group
-			g.SetLimit(5)
-			
-			for _, track := range *tracks {
-				if track.Present {
-					continue
-				}
-					
-				g.Go(func() error {
-		
-					if err := d.QueryTrack(track); err != nil {
-						log.Println(err.Error())
-						return nil
-					}
-					if err := d.GetTrack(track); err != nil {
-						log.Println(err.Error())
-						return nil
-					}
+func (c *DownloadClient) StartDownload(tracks *[]*models.Track) {
+	for _, d := range c.Downloaders {
+		var g errgroup.Group
+		g.SetLimit(5)
+
+		for _, track := range *tracks {
+			if track.Present {
+				continue
+			}
+
+			g.Go(func() error {
+
+				if err := d.QueryTrack(track); err != nil {
+					log.Println(err.Error())
 					return nil
-				})
+				}
+				if err := d.GetTrack(track); err != nil {
+					log.Println(err.Error())
+					return nil
+				}
+				return nil
+			})
 		}
 		if err := g.Wait(); err != nil {
 			return
 		}
-		
+
 		if err := d.MonitorDownloads(*tracks); err != nil {
-				log.Printf("track monitoring failed: %s", err.Error())
+			log.Printf("track monitoring failed: %s", err.Error())
 		}
 	}
 	filterTracks(tracks)
@@ -109,14 +110,13 @@ func filterTracks(tracks *[]*models.Track) { // only keep tracks that were downl
 	}
 	*tracks = filteredTracks
 }
-<<<<<<< HEAD
 
 func containsLower(str string, substr string) bool {
 
 	return strings.Contains(
-        strings.ToLower(str),
-        strings.ToLower(substr),
-    )
+		strings.ToLower(str),
+		strings.ToLower(substr),
+	)
 }
 
 func sanitizeName(s string) string { // return string with only letters and digits
@@ -131,9 +131,8 @@ func getFilename(title, artist string) string {
 	t := re.ReplaceAllString(title, "_")
 	a := re.ReplaceAllString(artist, "_")
 
-	return fmt.Sprintf("%s-%s",t,a)
+	return fmt.Sprintf("%s-%s", t, a)
 }
-<<<<<<< HEAD
 
 func moveDownload(srcDir, destDir, trackPath, file string) error { // Move download from the source dir to the dest dir (download dir)
 	trackDir := filepath.Join(srcDir, trackPath)
@@ -190,7 +189,3 @@ func moveDownload(srcDir, destDir, trackPath, file string) error { // Move downl
 
 	return nil
 }
-=======
-=======
->>>>>>> 3f855d8 (Implement initial support for Lidarr downloader)
->>>>>>> d3648a3 (Implement initial support for Lidarr downloader)
