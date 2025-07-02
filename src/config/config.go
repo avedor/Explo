@@ -18,7 +18,6 @@ type Config struct {
 	Persist      bool   `env:"PERSIST" env-default:"true"`
 	System       string `env:"EXPLO_SYSTEM"`
 	Debug        bool   `env:"DEBUG" env-default:"false"`
-	Timeout      int    `env:"TIMEOUT" env-default:"10"`
 }
 
 type ClientConfig struct {
@@ -26,6 +25,7 @@ type ClientConfig struct {
 	LibraryName  string `env:"LIBRARY_NAME" env-default:"Explo"`
 	URL          string `env:"SYSTEM_URL"`
 	DownloadDir  string `env:"DOWNLOAD_DIR" env-default:"/data/"`
+	SlskdDir     string `env:"SLSKD_DIR"`
 	PlaylistDir  string `env:"PLAYLIST_DIR"`
 	PlaylistName string
 	PlaylistID   string
