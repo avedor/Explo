@@ -79,7 +79,7 @@ func Monitor(tracks []*models.Track,
 
 				if fileStatus.BytesRemaining == 0 || fileStatus.PercentComplete == 100 || strings.Contains(fileStatus.State, "Succeeded") {
 					track.Present = true
-					log.Printf("[slskd] %s downloaded successfully", track.File)
+					log.Printf("[monitor] %s downloaded successfully", track.File)
 					file, path := parsePath(track.File)
 					if cfg.MigrateDownload {
 						if err = moveDownload(cfg.FromDir, cfg.ToDir, path, file); err != nil {
@@ -97,11 +97,11 @@ func Monitor(tracks []*models.Track,
 				} else if fileStatus.BytesTransferred > tracker.LastBytesTransferred {
 					tracker.LastBytesTransferred = fileStatus.BytesTransferred
 					tracker.LastUpdated = currentTime
-					log.Printf("[slskd] progress updated for %s: %d bytes transferred", track.File, fileStatus.BytesTransferred)
+					log.Printf("[monitor] progress updated for %s: %d bytes transferred", track.File, fileStatus.BytesTransferred)
 					continue
 
 				} else if currentTime.Sub(tracker.LastUpdated) > monitorDuration || strings.Contains(fileStatus.State, "Errored") || strings.Contains(fileStatus.State, "Cancelled") {
-					log.Printf("[slskd] no progress on %s in %v, skipping track", track.File, monitorDuration)
+					log.Printf("[monitor] no progress on %s in %v, skipping track", track.File, monitorDuration)
 					tracker.Skipped = true
 					cleanup(track, fileStatus.ID)
 					continue
@@ -110,7 +110,7 @@ func Monitor(tracks []*models.Track,
 
 			// Exit condition: all tracks have been processed or skipped
 			if tracksProcessed(tracks, progressMap) {
-				log.Printf("[slskd] %d out of %d tracks have been downloaded", successDownloads, len(tracks))
+				log.Printf("[monitor] %d out of %d tracks have been downloaded", successDownloads, len(tracks))
 				return nil
 			}
 		default:
