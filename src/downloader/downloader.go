@@ -2,15 +2,14 @@ package downloader
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path"
-	"log"
-	"strings"
-	"regexp"
-	"fmt"
 	"path/filepath"
-	"io"
+	"regexp"
+	"strings"
+
 	"golang.org/x/sync/errgroup"
 
 	cfg "explo/src/config"
