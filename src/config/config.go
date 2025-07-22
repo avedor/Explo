@@ -69,6 +69,8 @@ type Lidarr struct {
 	APIKey           string        `env:"LIDARR_API_KEY"`
 	Retry            int           `env:"LIDARR_RETRY" env-default:"5"`       // Number of times to check search status before skipping the track
 	DownloadAttempts int           `env:"LIDARR_DL_ATTEMPTS" env-default:"3"` // Max number of files to attempt downloading per track
+	LidarrDir        string        `env:"LIDARR_DIR" env-default:"/lidarr/"`
+	MigrateDL        bool          `env:"MIGRATE_DOWNLOADS" env-default:"false"` // Move downloads from SlskdDir to DownloadDir
 	Timeout          time.Duration `env:"LIDARR_TIMEOUT" env-default:"20s"`
 	Scheme           string        `env:"LIDARR_SCHEME" env-default:"http"`
 	URL              string        `env:"LIDARR_URL"`
@@ -89,11 +91,20 @@ type SubsonicConfig struct {
 	Password string `env:"SUBSONIC_PASSWORD"`
 }
 
+type Youtube struct {
+	APIKey     string `env:"YOUTUBE_API_KEY"`
+	FfmpegPath string `env:"FFMPEG_PATH"`
+	YtdlpPath  string `env:"YTDLP_PATH"`
+	Filters    Filters
+}
+
 type Slskd struct {
 	APIKey           string        `env:"SLSKD_API_KEY"`
 	URL              string        `env:"SLSKD_URL"`
 	Retry            int           `env:"SLSKD_RETRY" env-default:"5"`       // Number of times to check search status before skipping the track
 	DownloadAttempts int           `env:"SLSKD_DL_ATTEMPTS" env-default:"3"` // Max number of files to attempt downloading per track
+	SlskdDir         string        `env:"SLSKD_DIR" env-default:"/slskd/"`
+	MigrateDL        bool          `env:"MIGRATE_DOWNLOADS" env-default:"false"` // Move downloads from SlskdDir to DownloadDir
 	Timeout          time.Duration `env:"SLSKD_TIMEOUT" env-default:"20s"`
 	Filters          Filters
 }
