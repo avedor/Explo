@@ -25,7 +25,6 @@ type ClientConfig struct {
 	LibraryName  string `env:"LIBRARY_NAME" env-default:"Explo"`
 	URL          string `env:"SYSTEM_URL"`
 	DownloadDir  string `env:"DOWNLOAD_DIR" env-default:"/data/"`
-	SlskdDir     string `env:"SLSKD_DIR"`
 	PlaylistDir  string `env:"PLAYLIST_DIR"`
 	PlaylistName string
 	PlaylistID   string
@@ -51,7 +50,6 @@ type DiscoveryConfig struct {
 
 type DownloadConfig struct {
 	DownloadDir string `env:"DOWNLOAD_DIR"  env-default:"/data/"`
-	Lidarr      Lidarr
 	Slskd       Slskd
 	Youtube     Youtube
 	Discovery   string   `env:"LISTENBRAINZ_DISCOVERY" env-default:"playlist"`
@@ -65,6 +63,12 @@ type Filters struct {
 	FilterList  []string `env:"FILTER_LIST" env-default:"live,remix,instrumental,extended"`
 }
 
+type Listenbrainz struct {
+	Discovery    string `env:"LISTENBRAINZ_DISCOVERY" env-default:"playlist"`
+	User         string `env:"LISTENBRAINZ_USER"`
+	SingleArtist bool   `env:"SINGLE_ARTIST" env-default:"true"`
+}
+
 type Lidarr struct {
 	APIKey           string        `env:"LIDARR_API_KEY"`
 	Retry            int           `env:"LIDARR_RETRY" env-default:"5"`       // Number of times to check search status before skipping the track
@@ -75,12 +79,6 @@ type Lidarr struct {
 	Scheme           string        `env:"LIDARR_SCHEME" env-default:"http"`
 	URL              string        `env:"LIDARR_URL"`
 	Filters          Filters
-}
-
-type Listenbrainz struct {
-	Discovery    string `env:"LISTENBRAINZ_DISCOVERY" env-default:"playlist"`
-	User         string `env:"LISTENBRAINZ_USER"`
-	SingleArtist bool   `env:"SINGLE_ARTIST" env-default:"true"`
 }
 
 type SubsonicConfig struct {
@@ -107,51 +105,6 @@ type Slskd struct {
 	MigrateDL        bool          `env:"MIGRATE_DOWNLOADS" env-default:"false"` // Move downloads from SlskdDir to DownloadDir
 	Timeout          time.Duration `env:"SLSKD_TIMEOUT" env-default:"20s"`
 	Filters          Filters
-}
-
-type Youtube struct {
-	APIKey     string `env:"YOUTUBE_API_KEY"`
-	FfmpegPath string `env:"FFMPEG_PATH"`
-	YtdlpPath  string `env:"YTDLP_PATH"`
-	Filters    Filters
-}
-
-type Slskd struct {
-	APIKey           string        `env:"SLSKD_API_KEY"`
-	URL              string        `env:"SLSKD_URL"`
-	Retry            int           `env:"SLSKD_RETRY" env-default:"5"`       // Number of times to check search status before skipping the track
-	DownloadAttempts int           `env:"SLSKD_DL_ATTEMPTS" env-default:"3"` // Max number of files to attempt downloading per track
-	SlskdDir         string        `env:"SLSKD_DIR" env-default:"/slskd/"`
-	MigrateDL        bool          `env:"MIGRATE_DOWNLOADS" env-default:"false"` // Move downloads from SlskdDir to DownloadDir
-	Timeout          time.Duration `env:"SLSKD_TIMEOUT" env-default:"20s"`
-	Filters          Filters
-}
-
-type DiscoveryConfig struct {
-	Discovery    string `env:"DISCOVERY_SERVICE" env-default:"listenbrainz"`
-	Separator    string `env:"FILENAME_SEPARATOR" env-default:" "`
-	Listenbrainz Listenbrainz
-}
-
-type DownloadConfig struct {
-	DownloadDir string `env:"DOWNLOAD_DIR"  env-default:"/data/"`
-	Slskd       Slskd
-	Youtube     Youtube
-	Discovery   string   `env:"LISTENBRAINZ_DISCOVERY" env-default:"playlist"`
-	Services    []string `env:"DOWNLOAD_SERVICES" env-default:"youtube"`
-}
-
-type Filters struct {
-	Extensions  []string `env:"EXTENSIONS" env-default:"flac,mp3"`
-	MinBitDepth int      `env:"MIN_BIT_DEPTH" env-default:"8"`
-	MinBitRate  int      `env:"MIN_BITRATE" env-default:"256"`
-	FilterList  []string `env:"FILTER_LIST" env-default:"live,remix,instrumental,extended"`
-}
-
-type Listenbrainz struct {
-	Discovery    string `env:"LISTENBRAINZ_DISCOVERY" env-default:"playlist"`
-	User         string `env:"LISTENBRAINZ_USER"`
-	SingleArtist bool   `env:"SINGLE_ARTIST" env-default:"true"`
 }
 
 func ReadEnv() Config {
