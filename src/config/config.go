@@ -50,6 +50,7 @@ type DiscoveryConfig struct {
 
 type DownloadConfig struct {
 	DownloadDir string `env:"DOWNLOAD_DIR"  env-default:"/data/"`
+	Lidarr      Lidarr
 	Slskd       Slskd
 	Youtube     Youtube
 	Discovery   string   `env:"LISTENBRAINZ_DISCOVERY" env-default:"playlist"`
